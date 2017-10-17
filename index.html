@@ -1,0 +1,53 @@
+<head>
+
+</head>
+
+<body>
+  <h1>Video Info</h1>
+  <form>
+    <div>
+      <label>Select a video:</label>
+      <input type="file" accept="video/*" />
+    </div>
+
+    <button type="submit">Get Info</button>
+  </form>
+
+  <h1 id="result"></h1>
+
+  <script>
+  
+    const electron = require('electron');
+    /*
+      NOTE {ipcRenderer} object below is what allows you to communicate from
+      this browser window back over to the electron process that is hosting
+      this browserWindow
+    */
+    const { ipcRenderer } = electron;
+
+    document.querySelector('form').addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      /*
+        NOTE !!!!!IMPORTANT!!!!! const {path} vs const path, means you are
+        destructing the path prop from that object and calling it const path
+      */
+      const { path } = document.querySelector('input').files[0];
+
+      /*
+       NOTE naming convention for events to keep consistant,
+       NameOfThingDealingWith:Action eg noun:verb
+      */
+      ipcRenderer.send('video:submit', path);
+
+      // NOTE auto stops actions when you use debugger
+      // debugger
+    });
+
+    ipcRenderer.on('video:metadata', (event, duration) => {
+      console.log('submitted', duration);
+      document.querySelector('#result').innerHTML = `Video is ${duration} seconds`;
+    });
+
+  </script>
+</body>
